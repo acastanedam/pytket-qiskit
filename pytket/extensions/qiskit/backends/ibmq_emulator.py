@@ -28,6 +28,7 @@ from typing import (
 from warnings import warn
 
 from qiskit.providers.aer import AerSimulator  # type: ignore
+from qiskit.providers.fake_provider import fake_provider
 from qiskit.providers.aer.noise.noise_model import NoiseModel  # type: ignore
 from qiskit.providers.ibmq import AccountProvider  # type: ignore
 from qiskit_ibm_runtime import (  # type: ignore
@@ -81,6 +82,9 @@ class IBMQEmulatorBackend(Backend):
         docs for more details.
         """
         super().__init__()
+        if "fake" in backend_name:
+            account_provider = fake_provider.FakeProvider()
+
         self._ibmq = IBMQBackend(
             backend_name=backend_name,
             hub=hub,
@@ -91,7 +95,7 @@ class IBMQEmulatorBackend(Backend):
         )
 
         self._service = QiskitRuntimeService(channel="ibm_quantum", token=token)
-        self._session = Session(service=self._service, backend="ibmq_qasm_simulator")
+        self._serviceession = Session(service=self._service, backend="ibmq_qasm_simulator")
 
         # Get noise model:
         aer_sim = AerSimulator.from_backend(self._ibmq._backend)
