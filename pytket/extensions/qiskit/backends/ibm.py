@@ -251,6 +251,11 @@ class IBMQBackend(Backend):
 
     @classmethod
     def _get_backend_info(cls, backend: "_QiskIBMQBackend") -> BackendInfo:
+        backend_version = backend.version
+        if backend_version == 2:
+            backend_name = backend.name
+        else:
+            backend_name = backend.name()
         config = backend.configuration()
         characterisation = process_characterisation(backend)
         averaged_errors = get_avg_characterisation(characterisation)
@@ -284,7 +289,7 @@ class IBMQBackend(Backend):
         gate_set = _tk_gate_set(backend)
         backend_info = BackendInfo(
             cls.__name__,
-            backend.name(),
+            backend_name,
             __extension_version__,
             arch,
             gate_set.union(
